@@ -78,8 +78,22 @@ const elements = {
     notificationContainer: document.getElementById('notification-container'),
     waterLiters: document.getElementById('water-liters'),
     waterCost: document.getElementById('water-cost'),
-    savingsAlert: document.getElementById('savings-alert')
+    savingsAlert: document.getElementById('savings-alert'),
+    currentTime: document.getElementById('current-time')
 };
+
+// --- CLOCK UPDATE ---
+const updateClock = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    elements.currentTime.textContent = `${hours}:${minutes}:${seconds}`;
+};
+
+// Update clock every second
+setInterval(updateClock, 1000);
+updateClock(); // Initial call
 
 // --- WEATHER & FORECAST ---
 const syncWeather = async () => {
