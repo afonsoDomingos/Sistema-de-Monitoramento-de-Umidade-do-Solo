@@ -16,13 +16,14 @@
         }
 
         .docs-wrapper {
-            max-width: 1200px;
+            max-width: 1260px;
             margin: 0 auto;
             padding: 2rem;
             display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 3rem;
+            grid-template-columns: 280px minmax(0, 1fr);
+            gap: 2.5rem;
             min-height: 100vh;
+            width: 100%;
         }
 
         /* Sidebar Navigation */
@@ -38,6 +39,7 @@
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            overflow-y: auto;
         }
 
         .sidebar-title {
@@ -75,17 +77,20 @@
         /* Documentation Content */
         .docs-content {
             padding-bottom: 5rem;
+            min-width: 0;
+            /* Critical for grid item overflow */
         }
 
         .doc-hero {
-            margin-bottom: 4rem;
-            padding: 4rem;
+            margin-bottom: 3rem;
+            padding: 3.5rem 2rem;
             background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(52, 152, 219, 0.1));
             border-radius: 32px;
             border: 1px solid var(--card-border);
             text-align: center;
             position: relative;
             overflow: hidden;
+            width: 100%;
         }
 
         .doc-hero h1 {
@@ -93,6 +98,7 @@
             margin-bottom: 1rem;
             background: linear-gradient(to right, #fff, var(--docs-primary));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -207,10 +213,16 @@
         }
 
         /* Tech Table */
+        .tech-table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+
         .tech-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1.5rem;
+            min-width: 500px;
         }
 
         .tech-table th,
@@ -230,6 +242,7 @@
             border-radius: 99px;
             font-size: 0.75rem;
             font-weight: 700;
+            white-space: nowrap;
         }
 
         .badge-real {
@@ -245,18 +258,19 @@
         }
 
         /* Responsive */
-        @media (max-width: 1024px) {
+        @media (max-width: 1100px) {
             .docs-wrapper {
                 grid-template-columns: 1fr;
+                padding: 1rem;
             }
 
             .docs-sidebar {
                 display: none;
-                /* Can be changed to a top nav or hamburger later */
             }
 
             .doc-hero {
-                padding: 2rem;
+                padding: 2.5rem 1.5rem;
+                border-radius: 20px;
             }
 
             .doc-hero h1 {
@@ -340,37 +354,39 @@
                 <p>O AquaFlow opera com um modelo de dados híbrido que combina inteligência local com dados globais de
                     satélite para máxima precisão.</p>
 
-                <table class="tech-table">
-                    <thead>
-                        <tr>
-                            <th>Módulo</th>
-                            <th>Fonte</th>
-                            <th>Tipo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Clima em Tempo Real</td>
-                            <td>Open-Meteo API (Satélite)</td>
-                            <td><span class="badge badge-real">REAL</span></td>
-                        </tr>
-                        <tr>
-                            <td>Previsão para 3 Dias</td>
-                            <td>Open-Meteo Forecast</td>
-                            <td><span class="badge badge-real">REAL</span></td>
-                        </tr>
-                        <tr>
-                            <td>Umidade do Solo</td>
-                            <td>Algoritmo Botânico (Gêmeo Digital)</td>
-                            <td><span class="badge badge-sim">SIMULADO</span></td>
-                        </tr>
-                        <tr>
-                            <td>Consumo de Água</td>
-                            <td>Medição por Tempo de Fluxo</td>
-                            <td><span class="badge badge-sim">ESTIMADO</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="tech-table-container">
+                    <table class="tech-table">
+                        <thead>
+                            <tr>
+                                <th>Módulo</th>
+                                <th>Fonte</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Clima em Tempo Real</td>
+                                <td>Open-Meteo API (Satélite)</td>
+                                <td><span class="badge badge-real">REAL</span></td>
+                            </tr>
+                            <tr>
+                                <td>Previsão para 3 Dias</td>
+                                <td>Open-Meteo Forecast</td>
+                                <td><span class="badge badge-real">REAL</span></td>
+                            </tr>
+                            <tr>
+                                <td>Umidade do Solo</td>
+                                <td>Algoritmo Botânico (Gêmeo Digital)</td>
+                                <td><span class="badge badge-sim">SIMULADO</span></td>
+                            </tr>
+                            <tr>
+                                <td>Consumo de Água</td>
+                                <td>Medição por Tempo de Fluxo</td>
+                                <td><span class="badge badge-sim">ESTIMADO</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </section>
 
             <section class="section-card" id="crops">
