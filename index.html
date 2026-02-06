@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaFlow | Monitoramento Inteligente</title>
+    <meta name="description" content="Sistema inteligente de monitoramento de solo e irrigação automatizada. Controle sua plantação com precisão tecnológica.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="glass-bg"></div>
+    
+    <header>
+        <div class="logo">
+            <i data-lucide="droplets" class="icon-logo"></i>
+            <h1>AquaFlow</h1>
+        </div>
+        <div class="system-status">
+            <span class="status-indicator"></span>
+            <span class="status-text">Sistema Ativo</span>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <section class="main-stats">
+            <div class="card moisture-card">
+                <div class="card-header">
+                    <h3>Umidade do Solo</h3>
+                    <i data-lucide="sprout"></i>
+                </div>
+                <div class="gauge-container">
+                    <svg viewBox="0 0 100 100" class="gauge">
+                        <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="gauge-progress" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div class="gauge-value">
+                        <span id="moisture-value">45</span>%
+                    </div>
+                </div>
+                <p class="moisture-status" id="moisture-status">Solo Seco - Necessita Irrigação</p>
+            </div>
+
+            <div class="card pump-card">
+                <div class="card-header">
+                    <h3>Status da Bomba</h3>
+                    <i data-lucide="wind"></i>
+                </div>
+                <div class="pump-visual">
+                    <div class="pump-icon-container" id="pump-animation">
+                        <i data-lucide="settings" class="pump-icon"></i>
+                    </div>
+                    <div class="water-flow" id="water-flow"></div>
+                </div>
+                <div class="pump-control">
+                    <label class="switch">
+                        <input type="checkbox" id="pump-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="pump-status-text">Desligada</span>
+                </div>
+                <p class="auto-mode-info">Modo Automático: <strong id="auto-mode-status">Ativado</strong></p>
+            </div>
+        </section>
+
+        <section class="side-stats">
+            <div class="card weather-card">
+                <div class="card-header">
+                    <h3>Dados Meteorológicos</h3>
+                    <i data-lucide="cloud-sun"></i>
+                </div>
+                <div class="weather-content">
+                    <div class="weather-main">
+                        <i data-lucide="sun" class="weather-icon-large" id="weather-icon"></i>
+                        <div class="temp-container">
+                            <span id="current-temp" class="temp">28</span><span class="unit">°C</span>
+                        </div>
+                    </div>
+                    <div class="weather-details">
+                        <div class="w-detail">
+                            <i data-lucide="thermometer"></i>
+                            <span>Máx: <strong id="max-temp">31°C</strong></span>
+                        </div>
+                        <div class="w-detail">
+                            <i data-lucide="droplets"></i>
+                            <span>Hum: <strong id="weather-humidity">12%</strong></span>
+                        </div>
+                        <div class="w-detail">
+                            <i data-lucide="wind"></i>
+                            <span>Vento: <strong id="wind-speed">15 km/h</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card logs-card">
+                <div class="card-header">
+                    <h3>Atividade Recente</h3>
+                    <i data-lucide="list"></i>
+                </div>
+                <ul class="log-list" id="activity-logs">
+                    <li><span class="log-time">19:00</span> Bomba desligada automaticamente</li>
+                    <li><span class="log-time">18:45</span> Umidade atingiu 75%</li>
+                    <li><span class="log-time">18:30</span> Irrigação iniciada</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+</body>
+</html>
