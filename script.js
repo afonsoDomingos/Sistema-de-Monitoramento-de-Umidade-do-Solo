@@ -79,16 +79,26 @@ const elements = {
     waterLiters: document.getElementById('water-liters'),
     waterCost: document.getElementById('water-cost'),
     savingsAlert: document.getElementById('savings-alert'),
-    currentTime: document.getElementById('current-time')
+    currentTime: document.getElementById('current-time'),
+    currentDate: document.getElementById('current-date'),
+    precipitation: document.getElementById('precipitation')
 };
 
 // --- CLOCK UPDATE ---
 const updateClock = () => {
     const now = new Date();
+
+    // Time
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     elements.currentTime.textContent = `${hours}:${minutes}:${seconds}`;
+
+    // Date
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    elements.currentDate.textContent = `${day}/${month}/${year}`;
 };
 
 // Update clock every second
@@ -99,7 +109,7 @@ updateClock(); // Initial call
 const syncWeather = async () => {
     try {
         const loc = CONFIG.LOCATIONS[state.currentLocation];
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max&timezone=auto`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code&daily=weather_code,temperature_2m_max&timezone=auto`;
 
         const response = await fetch(url);
         const data = await response.json();
@@ -110,6 +120,7 @@ const syncWeather = async () => {
         elements.weatherHumidity.textContent = data.current.relative_humidity_2m + "%";
         elements.windSpeed.textContent = Math.round(data.current.wind_speed_10m) + " km/h";
         elements.maxTemp.textContent = Math.round(data.daily.temperature_2m_max[0]) + "°C";
+        elements.precipitation.textContent = data.current.precipitation.toFixed(1) + " mm";
 
         setWeatherIcon(elements.weatherIcon, data.current.weather_code);
 
