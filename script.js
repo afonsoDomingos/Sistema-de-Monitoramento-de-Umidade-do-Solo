@@ -16,11 +16,17 @@ const CONFIG = {
         arroz: { low: 80, high: 98, name: "Arroz" },
         cana: { low: 65, high: 85, name: "Cana-de-Açúcar" },
         milho: { low: 40, high: 70, name: "Milho" },
+        soja: { low: 55, high: 80, name: "Soja" },
+        algodao: { low: 45, high: 70, name: "Algodão" },
         mandioca: { low: 30, high: 55, name: "Mandioca" },
         batata_doce: { low: 50, high: 75, name: "Batata-doce" },
         amendoim: { low: 35, high: 55, name: "Amendoim" },
+        gergelim: { low: 30, high: 50, name: "Gergelim" },
+        girassol: { low: 40, high: 65, name: "Girassol" },
         tomate: { low: 50, high: 80, name: "Tomate" },
-        feijao: { low: 45, high: 70, name: "Feijão Caupi" }
+        feijao: { low: 45, high: 70, name: "Feijão Caupi" },
+        citrinos: { low: 50, high: 75, name: "Citrinos" },
+        caju: { low: 40, high: 60, name: "Castanha de Caju" }
     }
 };
 
