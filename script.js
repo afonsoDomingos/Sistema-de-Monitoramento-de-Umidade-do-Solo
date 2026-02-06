@@ -1,32 +1,34 @@
 // Configuration & State
 const CONFIG = {
-    CRITICAL_LOW: 25,
-    CRITICAL_HIGH: 85,
     UPDATE_INTERVAL: 2000,
-    WEATHER_SYNC_INTERVAL: 600000, // 10 minutes
+    WEATHER_SYNC_INTERVAL: 600000,
     CHART_POINTS: 20,
-    LOCATION: {
-        lat: -25.9692,
-        lon: 32.5732,
-        name: "Moçambique (Maputo)"
+    LOCATIONS: {
+        mapito: { lat: -25.9692, lon: 32.5732, name: "Maputo" },
+        beira: { lat: -19.8436, lon: 34.8389, name: "Beira" },
+        nampula: { lat: -15.1165, lon: 39.2662, name: "Nampula" },
+        quelimane: { lat: -17.8764, lon: 36.8878, name: "Quelimane" }
+    },
+    CROP_PROFILES: {
+        banana: { low: 60, high: 90, name: "Banana" },
+        milho: { low: 40, high: 70, name: "Milho" },
+        cacto: { low: 15, high: 35, name: "Cacto" },
+        tomate: { low: 50, high: 80, name: "Tomate" }
     }
 };
 
 let state = {
-    moisture: 45,
+    currentLocation: 'mapito',
+    currentCrop: 'banana',
+    limits: { low: 60, high: 90 },
+    moisture: 65,
     isPumpOn: false,
     isAutoMode: true,
-    temperature: "--",
-    humidity: "--",
-    windSpeed: "--",
-    maxTemp: "--",
-    condition: "Desconhecido",
     theme: 'dark',
-    moistureHistory: Array(CONFIG.CHART_POINTS).fill(45),
+    weather: { current: {}, forecast: [] },
+    moistureHistory: Array(CONFIG.CHART_POINTS).fill(65),
     timeLabels: Array(CONFIG.CHART_POINTS).fill(''),
-    logs: [
-        { time: new Date().toLocaleTimeString([], { hour: '2bit', minute: '2bit' }), message: "Sistema AquaFlow inicializado" }
-    ]
+    logs: []
 };
 
 // DOM Elements
@@ -37,152 +39,115 @@ const elements = {
     pumpToggle: document.getElementById('pump-toggle'),
     pumpStatusText: document.getElementById('pump-status-text'),
     pumpVisual: document.querySelector('.pump-visual'),
-    autoModeStatus: document.getElementById('auto-mode-status'),
     currentTemp: document.getElementById('current-temp'),
     weatherHumidity: document.getElementById('weather-humidity'),
     windSpeed: document.getElementById('wind-speed'),
     maxTemp: document.getElementById('max-temp'),
+    weatherIcon: document.getElementById('weather-icon'),
+    locationName: document.getElementById('location-name'),
+    forecastList: document.getElementById('forecast-list'),
     logList: document.getElementById('activity-logs'),
-    notificationContainer: document.getElementById('notification-container'),
+    cropSelect: document.getElementById('crop-select'),
+    recommendedRange: document.getElementById('recommended-range'),
+    settingsBtn: document.getElementById('settings-btn'),
+    settingsModal: document.getElementById('settings-modal'),
+    closeModal: document.querySelector('.close-modal'),
+    locationSelect: document.getElementById('location-select'),
+    rangeLow: document.getElementById('range-low'),
+    rangeHigh: document.getElementById('range-high'),
+    labelLow: document.getElementById('label-low'),
+    labelHigh: document.getElementById('label-high'),
+    saveSettings: document.getElementById('save-settings'),
     themeToggle: document.getElementById('theme-toggle'),
     themeIcon: document.getElementById('theme-icon'),
-    weatherIcon: document.getElementById('weather-icon')
+    notificationContainer: document.getElementById('notification-container')
 };
 
-// --- WEATHER INTEGRATION (Open-Meteo) ---
+// --- WEATHER & FORECAST ---
 const syncWeather = async () => {
     try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.LOCATION.lat}&longitude=${CONFIG.LOCATION.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max&timezone=auto`;
+        const loc = CONFIG.LOCATIONS[state.currentLocation];
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max&timezone=auto`;
 
         const response = await fetch(url);
         const data = await response.json();
 
-        state.temperature = Math.round(data.current.temperature_2m);
-        state.humidity = data.current.relative_humidity_2m;
-        state.windSpeed = Math.round(data.current.wind_speed_10m);
-        state.maxTemp = Math.round(data.daily.temperature_2m_max[0]);
+        // Update UI
+        elements.locationName.textContent = loc.name;
+        elements.currentTemp.textContent = Math.round(data.current.temperature_2m);
+        elements.weatherHumidity.textContent = data.current.relative_humidity_2m + "%";
+        elements.windSpeed.textContent = Math.round(data.current.wind_speed_10m) + " km/h";
+        elements.maxTemp.textContent = Math.round(data.daily.temperature_2m_max[0]) + "°C";
 
-        updateWeatherUI(data.current.weather_code);
+        setWeatherIcon(elements.weatherIcon, data.current.weather_code);
 
-        console.log(`Weather synced for ${CONFIG.LOCATION.name}: ${state.temperature}°C`);
-    } catch (error) {
-        console.error("Failed to sync weather:", error);
-        showNotification("Erro de Conexão", "Não foi possível carregar dados meteorológicos reais.", "warning");
-    }
-};
-
-const updateWeatherUI = (code) => {
-    elements.currentTemp.textContent = state.temperature;
-    elements.weatherHumidity.textContent = state.humidity + "%";
-    elements.windSpeed.textContent = state.windSpeed + " km/h";
-    elements.maxTemp.textContent = state.maxTemp + "°C";
-
-    // Map WMO codes to Lucide icons
-    let iconName = 'sun';
-    if (code >= 1 && code <= 3) iconName = 'cloud-sun';
-    else if (code >= 45 && code <= 48) iconName = 'cloud';
-    else if (code >= 51 && code <= 67) iconName = 'cloud-rain';
-    else if (code >= 71 && code <= 77) iconName = 'cloud-snow';
-    else if (code >= 80 && code <= 99) iconName = 'cloud-lightning';
-
-    elements.weatherIcon.setAttribute('data-lucide', iconName);
-    lucide.createIcons();
-};
-
-// --- CHART INITIALIZATION ---
-let moistureChart;
-const initChart = () => {
-    const ctx = document.getElementById('moistureChart').getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(46, 204, 113, 0.4)');
-    gradient.addColorStop(1, 'rgba(46, 204, 113, 0)');
-
-    moistureChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: state.timeLabels,
-            datasets: [{
-                label: 'Umidade (%)',
-                data: state.moistureHistory,
-                borderColor: '#2ecc71',
-                borderWidth: 3,
-                backgroundColor: gradient,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 0,
-                pointHitRadius: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    grid: { color: state.theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
-                    ticks: { color: '#94a3b8' }
-                },
-                x: { grid: { display: false }, ticks: { display: false } }
-            }
+        // Update Forecast
+        elements.forecastList.innerHTML = '';
+        for (let i = 1; i <= 3; i++) {
+            const date = new Date(data.daily.time[i]);
+            const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' });
+            const item = document.createElement('div');
+            item.className = 'forecast-item';
+            item.innerHTML = `
+                <span class="forecast-day">${dayName}</span>
+                <i class="forecast-icon" data-lucide="${getIconName(data.daily.weather_code[i])}"></i>
+                <span class="forecast-temp">${Math.round(data.daily.temperature_2m_max[i])}°C</span>
+            `;
+            elements.forecastList.appendChild(item);
         }
-    });
-};
-
-// --- THEME MANAGEMENT ---
-const toggleTheme = () => {
-    state.theme = state.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', state.theme);
-    elements.themeIcon.setAttribute('data-lucide', state.theme === 'dark' ? 'moon' : 'sun');
-    lucide.createIcons();
-    if (moistureChart) {
-        moistureChart.options.scales.y.grid.color = state.theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-        moistureChart.update();
+        lucide.createIcons();
+    } catch (e) {
+        showNotification("Erro no Clima", "Não foi possível carregar a previsão.", "warning");
     }
-    localStorage.setItem('aquaflow-theme', state.theme);
 };
 
-// --- NOTIFICATION SYSTEM ---
-const showNotification = (title, message, type = 'success') => {
-    const id = Date.now();
-    const iconMap = { critical: 'alert-triangle', warning: 'info', success: 'check-circle' };
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type} ${type}`;
-    notification.id = `notif-${id}`;
-    notification.innerHTML = `
-        <i data-lucide="${iconMap[type] || 'check-circle'}"></i>
-        <div class="notification-content">
-            <h4>${title}</h4>
-            <p>${message}</p>
-        </div>
-    `;
-    elements.notificationContainer.appendChild(notification);
-    lucide.createIcons();
-    setTimeout(() => notification.classList.add('show'), 100);
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 500);
-    }, 5000);
+const getIconName = (code) => {
+    if (code === 0) return 'sun';
+    if (code <= 3) return 'cloud-sun';
+    if (code <= 48) return 'cloud';
+    if (code <= 67) return 'cloud-rain';
+    if (code <= 99) return 'cloud-lightning';
+    return 'sun';
 };
 
-// --- UPDATE UI FUNCTIONS ---
+const setWeatherIcon = (el, code) => {
+    el.setAttribute('data-lucide', getIconName(code));
+};
+
+// --- SETTINGS & CROP LOGIC ---
+const updateCropProfile = (profileKey) => {
+    const profile = CONFIG.CROP_PROFILES[profileKey];
+    state.currentCrop = profileKey;
+    state.limits.low = profile.low;
+    state.limits.high = profile.high;
+
+    // Update UI
+    elements.recommendedRange.textContent = `${profile.low}% - ${profile.high}%`;
+    elements.rangeLow.value = profile.low;
+    elements.rangeHigh.value = profile.high;
+    elements.labelLow.textContent = profile.low;
+    elements.labelHigh.textContent = profile.high;
+
+    addLog(`Cultivo alterado para: ${profile.name}`);
+};
+
+// --- CORE FUNCTIONS ---
 const setGaugeValue = (value) => {
-    const circumference = 2 * Math.PI * 45;
-    elements.gaugeProgress.style.strokeDashoffset = circumference - (value / 100) * circumference;
+    const circum = 2 * Math.PI * 45;
+    elements.gaugeProgress.style.strokeDashoffset = circum - (value / 100) * circum;
     elements.moistureValue.textContent = Math.round(value);
 
-    if (value < CONFIG.CRITICAL_LOW) {
-        elements.gaugeProgress.stroke = "#ef4444";
-        elements.moistureStatus.textContent = "CRÍTICO: Solo Muito Seco!";
+    if (value < state.limits.low) {
+        elements.gaugeProgress.style.stroke = "#ef4444";
+        elements.moistureStatus.textContent = "ALERTA: Solo Seco";
         elements.moistureStatus.style.color = "#ef4444";
-    } else if (value < 60) {
-        elements.gaugeProgress.style.stroke = "#f1c40f";
-        elements.moistureStatus.textContent = "Atenção: Solo Seco";
-        elements.moistureStatus.style.color = "#f1c40f";
+    } else if (value > state.limits.high) {
+        elements.gaugeProgress.style.stroke = "#3498db";
+        elements.moistureStatus.textContent = "Solo Hidratado";
+        elements.moistureStatus.style.color = "#3498db";
     } else {
         elements.gaugeProgress.style.stroke = "#2ecc71";
-        elements.moistureStatus.textContent = "Umidade Ideal";
+        elements.moistureStatus.textContent = "Status OK";
         elements.moistureStatus.style.color = "#2ecc71";
     }
 };
@@ -191,44 +156,50 @@ const updatePump = (isOn, manual = false) => {
     state.isPumpOn = isOn;
     elements.pumpToggle.checked = isOn;
     elements.pumpStatusText.textContent = isOn ? "Ligada" : "Desligada";
-    elements.pumpStatusText.style.color = isOn ? "#2ecc71" : "#94a3b8";
     isOn ? elements.pumpVisual.classList.add('pump-active') : elements.pumpVisual.classList.remove('pump-active');
 
     if (manual) {
-        const msg = isOn ? "Bomba ativada manualmente" : "Bomba desativada manualmente";
-        addLog(msg);
-        showNotification("Comando Manual", msg, isOn ? 'success' : 'warning');
+        addLog(isOn ? "Bomba ligada manualmente" : "Bomba desligada manualmente");
+        showNotification("Manual", isOn ? "Irrigação Iniciada" : "Irrigação Parada", isOn ? "success" : "warning");
     }
 };
 
-const addLog = (message) => {
-    const timeStr = new Date().toLocaleTimeString([], { hour: '2bit', minute: '2bit' });
-    state.logs.unshift({ time: timeStr, message });
+const addLog = (msg) => {
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    state.logs.unshift({ time, msg });
     if (state.logs.length > 8) state.logs.pop();
     renderLogs();
 };
 
 const renderLogs = () => {
     elements.logList.innerHTML = state.logs
-        .map(log => `<li><span class="log-time">${log.time}</span> ${log.message}</li>`)
-        .join('');
+        .map(l => `<li><span class="log-time">${l.time}</span> ${l.msg}</li>`).join('');
 };
 
-// --- SIMULATION LOOP ---
+const showNotification = (title, message, type) => {
+    const n = document.createElement('div');
+    n.className = `notification notification-${type}`;
+    n.innerHTML = `<h4>${title}</h4><p>${message}</p>`;
+    elements.notificationContainer.appendChild(n);
+    setTimeout(() => n.classList.add('show'), 100);
+    setTimeout(() => { n.classList.remove('show'); setTimeout(() => n.remove(), 500); }, 4000);
+};
+
+// --- SIMULATION ---
 setInterval(() => {
     if (state.isPumpOn) {
-        state.moisture += Math.random() * 3 + 1;
-        if (state.moisture >= CONFIG.CRITICAL_HIGH && state.isAutoMode) {
+        state.moisture += 1.5;
+        if (state.moisture >= state.limits.high && state.isAutoMode) {
             updatePump(false);
-            addLog("Bomba desligada (Nível Ideal atingido)");
-            showNotification("Automação", "Irrigação concluída com sucesso.", "success");
+            addLog("Auto: Limite ideal atingido");
+            showNotification("Automação", "Solo Hidratado!", "success");
         }
     } else {
-        state.moisture -= Math.random() * 0.8;
-        if (state.moisture <= CONFIG.CRITICAL_LOW && state.isAutoMode && !state.isPumpOn) {
+        state.moisture -= 0.3;
+        if (state.moisture <= state.limits.low && state.isAutoMode && !state.isPumpOn) {
             updatePump(true);
-            addLog("Bomba ligada (Nível Crítico detectado)");
-            showNotification("Alerta de Umidade", "Solo muito seco! Iniciando irrigação.", "critical");
+            addLog("Auto: Umidade crítica detectada");
+            showNotification("Alerta", "Iniciando Irrigação", "critical");
         }
     }
     state.moisture = Math.max(0, Math.min(100, state.moisture));
@@ -238,15 +209,62 @@ setInterval(() => {
     if (moistureChart) moistureChart.update('none');
 }, CONFIG.UPDATE_INTERVAL);
 
-// Periodic Weather Sync
-setInterval(syncWeather, CONFIG.WEATHER_SYNC_INTERVAL);
+// --- EVENT LISTENERS ---
+elements.cropSelect.addEventListener('change', (e) => updateCropProfile(e.target.value));
+elements.settingsBtn.addEventListener('click', () => elements.settingsModal.classList.add('show'));
+elements.closeModal.addEventListener('click', () => elements.settingsModal.classList.remove('show'));
+elements.rangeLow.addEventListener('input', (e) => elements.labelLow.textContent = e.target.value);
+elements.rangeHigh.addEventListener('input', (e) => elements.labelHigh.textContent = e.target.value);
 
-// Event Listeners
-elements.pumpToggle.addEventListener('change', (e) => updatePump(e.target.checked, true));
-elements.themeToggle.addEventListener('click', toggleTheme);
+elements.saveSettings.addEventListener('click', () => {
+    state.currentLocation = elements.locationSelect.value;
+    state.limits.low = parseInt(elements.rangeLow.value);
+    state.limits.high = parseInt(elements.rangeHigh.value);
+    syncWeather();
+    elements.settingsModal.classList.remove('show');
+    showNotification("Salvo", "Configurações actualizadas.", "success");
+    addLog("Configurações do sistema alteradas");
+});
 
-// Initial Setup
-window.addEventListener('DOMContentLoaded', () => {
+elements.themeToggle.addEventListener('click', () => {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', state.theme);
+    elements.themeIcon.setAttribute('data-lucide', state.theme === 'dark' ? 'moon' : 'sun');
+    lucide.createIcons();
+    localStorage.setItem('aquaflow-theme', state.theme);
+});
+
+// --- CHART ---
+let moistureChart;
+const initChart = () => {
+    const ctx = document.getElementById('moistureChart').getContext('2d');
+    moistureChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: state.timeLabels,
+            datasets: [{
+                data: state.moistureHistory,
+                borderColor: '#2ecc71',
+                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { min: 0, max: 100, grid: { color: 'rgba(128,128,128,0.1)' } },
+                x: { display: false }
+            }
+        }
+    });
+};
+
+// --- INIT ---
+document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('aquaflow-theme');
     if (savedTheme) {
         state.theme = savedTheme;
@@ -254,12 +272,13 @@ window.addEventListener('DOMContentLoaded', () => {
         elements.themeIcon.setAttribute('data-lucide', state.theme === 'dark' ? 'moon' : 'sun');
     }
     initChart();
-    renderLogs();
-    setGaugeValue(state.moisture);
-    updatePump(state.isPumpOn);
-    syncWeather(); // Initial sync
+    updateCropProfile('banana');
+    syncWeather();
+    addLog("Painel de Controle operacional");
     lucide.createIcons();
-    setTimeout(() => {
-        showNotification("AquaFlow Mozambique", "Conectado a Maputo. Clima sincronizado.", "success");
-    }, 1500);
 });
+
+// PWA Service Worker (Basic registration)
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => { });
+}

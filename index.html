@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
@@ -23,6 +25,9 @@
             <h1>AquaFlow</h1>
         </div>
         <div class="header-actions">
+            <button id="settings-btn" class="settings-btn" title="Configurações">
+                <i data-lucide="settings"></i>
+            </button>
             <button id="theme-toggle" class="theme-toggle-btn" title="Alternar Tema">
                 <i data-lucide="moon" id="theme-icon"></i>
             </button>
@@ -35,6 +40,22 @@
 
     <main class="dashboard">
         <section class="main-stats">
+            <div class="card crop-selector-card">
+                <div class="card-header">
+                    <h3>Tipo de Cultivo</h3>
+                    <i data-lucide="leaf"></i>
+                </div>
+                <div class="crop-options">
+                    <select id="crop-select" class="custom-select">
+                        <option value="banana" selected>Banana (Umidade Alta)</option>
+                        <option value="milho">Milho (Umidade Média)</option>
+                        <option value="cacto">Cacto (Umidade Baixa)</option>
+                        <option value="tomate">Tomate (Equilibrado)</option>
+                    </select>
+                </div>
+                <p class="crop-info">Recomendado: <strong id="recommended-range">60% - 90%</strong></p>
+            </div>
+
             <div class="card moisture-card">
                 <div class="card-header">
                     <h3>Umidade em Tempo Real</h3>
@@ -89,30 +110,40 @@
         <section class="side-stats">
             <div class="card weather-card">
                 <div class="card-header">
-                    <h3>Clima Atual</h3>
+                    <h3>Clima em <span id="location-name">Maputo</span></h3>
                     <i data-lucide="cloud-sun"></i>
                 </div>
                 <div class="weather-content">
                     <div class="weather-main">
                         <i data-lucide="sun" class="weather-icon-large" id="weather-icon"></i>
                         <div class="temp-container">
-                            <span id="current-temp" class="temp">28</span><span class="unit">°C</span>
+                            <span id="current-temp" class="temp">--</span><span class="unit">°C</span>
                         </div>
                     </div>
                     <div class="weather-details">
                         <div class="w-detail">
                             <i data-lucide="thermometer"></i>
-                            <span>Máx: <strong id="max-temp">31°C</strong></span>
+                            <span>Máx: <strong id="max-temp">--°C</strong></span>
                         </div>
                         <div class="w-detail">
                             <i data-lucide="droplets"></i>
-                            <span>Hum: <strong id="weather-humidity">12%</strong></span>
+                            <span>Hum: <strong id="weather-humidity">--%</strong></span>
                         </div>
                         <div class="w-detail">
                             <i data-lucide="wind"></i>
-                            <span>Vento: <strong id="wind-speed">15 km/h</strong></span>
+                            <span>Vento: <strong id="wind-speed">-- km/h</strong></span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="card forecast-card">
+                <div class="card-header">
+                    <h3>Previsão (3 Dias)</h3>
+                    <i data-lucide="calendar"></i>
+                </div>
+                <div class="forecast-list" id="forecast-list">
+                    <!-- Forecast items will be injected here -->
                 </div>
             </div>
 
@@ -122,11 +153,41 @@
                     <i data-lucide="list"></i>
                 </div>
                 <ul class="log-list" id="activity-logs">
-                    <li><span class="log-time">10:30</span> Sistema AquaFlow inicializado</li>
+                    <li><span class="log-time">--:--</span> Inicializando...</li>
                 </ul>
             </div>
         </section>
     </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Configurações do Sistema</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <label>Localização (Cidade)</label>
+                    <select id="location-select" class="custom-select">
+                        <option value="maputo" selected>Maputo, Moçambique</option>
+                        <option value="beira">Beira, Moçambique</option>
+                        <option value="nampula">Nampula, Moçambique</option>
+                        <option value="quelimane">Quelimane, Moçambique</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <label>Limite Crítico (Ligar Bomba): <span id="label-low">25</span>%</label>
+                    <input type="range" id="range-low" min="10" max="50" value="25">
+                </div>
+                <div class="settings-group">
+                    <label>Limite Ideal (Desligar Bomba): <span id="label-high">85</span>%</label>
+                    <input type="range" id="range-high" min="60" max="95" value="85">
+                </div>
+                <button id="save-settings" class="primary-btn">Salvar Configurações</button>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div class="footer-content">

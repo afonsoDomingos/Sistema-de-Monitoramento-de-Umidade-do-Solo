@@ -1,0 +1,17 @@
+{
+  "name": "AquaFlow - Controle de Solo",
+  "short_name": "AquaFlow",
+  "description": "Sistema de Monitoramento de Solo e Irrigação Inteligente",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2ecc71",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3233/3233814.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
