@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AquaFlow | Monitoramento Inteligente</title>
-    <meta name="description" content="Sistema inteligente de monitoramento de solo e irrigação automatizada. Controle sua plantação com precisão tecnológica.">
+    <meta name="description"
+        content="Sistema inteligente de monitoramento de solo e irrigação automatizada. Controle sua plantação com precisão tecnológica.">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
     <div class="glass-bg"></div>
-    
+
     <header>
         <div class="logo">
             <i data-lucide="droplets" class="icon-logo"></i>
@@ -29,7 +32,7 @@
         <section class="main-stats">
             <div class="card moisture-card">
                 <div class="card-header">
-                    <h3>Umidade do Solo</h3>
+                    <h3>Umidade em Tempo Real</h3>
                     <i data-lucide="sprout"></i>
                 </div>
                 <div class="gauge-container">
@@ -46,14 +49,16 @@
 
             <div class="card pump-card">
                 <div class="card-header">
-                    <h3>Status da Bomba</h3>
+                    <h3>Controle da Bomba</h3>
                     <i data-lucide="wind"></i>
                 </div>
                 <div class="pump-visual">
                     <div class="pump-icon-container" id="pump-animation">
                         <i data-lucide="settings" class="pump-icon"></i>
                     </div>
-                    <div class="water-flow" id="water-flow"></div>
+                    <div class="water-flow-container">
+                        <div class="water-flow" id="water-flow"></div>
+                    </div>
                 </div>
                 <div class="pump-control">
                     <label class="switch">
@@ -64,12 +69,22 @@
                 </div>
                 <p class="auto-mode-info">Modo Automático: <strong id="auto-mode-status">Ativado</strong></p>
             </div>
+
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h3>Histórico de Umidade</h3>
+                    <i data-lucide="line-chart"></i>
+                </div>
+                <div class="chart-container">
+                    <canvas id="moistureChart"></canvas>
+                </div>
+            </div>
         </section>
 
         <section class="side-stats">
             <div class="card weather-card">
                 <div class="card-header">
-                    <h3>Dados Meteorológicos</h3>
+                    <h3>Clima Atual</h3>
                     <i data-lucide="cloud-sun"></i>
                 </div>
                 <div class="weather-content">
@@ -98,21 +113,23 @@
 
             <div class="card logs-card">
                 <div class="card-header">
-                    <h3>Atividade Recente</h3>
+                    <h3>Logs do Sistema</h3>
                     <i data-lucide="list"></i>
                 </div>
                 <ul class="log-list" id="activity-logs">
-                    <li><span class="log-time">19:00</span> Bomba desligada automaticamente</li>
-                    <li><span class="log-time">18:45</span> Umidade atingiu 75%</li>
-                    <li><span class="log-time">18:30</span> Irrigação iniciada</li>
+                    <li><span class="log-time">10:30</span> Sistema AquaFlow inicializado</li>
                 </ul>
             </div>
         </section>
     </main>
 
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
     <script>
-      lucide.createIcons();
+        lucide.createIcons();
     </script>
 </body>
+
 </html>
