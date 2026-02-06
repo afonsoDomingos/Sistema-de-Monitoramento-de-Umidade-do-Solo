@@ -290,14 +290,11 @@
             <a href="#intro" class="nav-link active">
                 <i data-lucide="info"></i> Introdução
             </a>
-            <a href="#data" class="nav-link">
-                <i data-lucide="database"></i> Dados e Transparência
+            <a href="#tech-stack" class="nav-link">
+                <i data-lucide="layers"></i> Stack Tecnológica
             </a>
-            <a href="#crops" class="nav-link">
-                <i data-lucide="leaf"></i> Catálogo de Culturas
-            </a>
-            <a href="#hardware" class="nav-link">
-                <i data-lucide="cpu"></i> Hardware e Sensores
+            <a href="#api-details" class="nav-link">
+                <i data-lucide="globe"></i> APIs Externas
             </a>
             <a href="#integration" class="nav-link">
                 <i data-lucide="code-2"></i> Guia de Integração
@@ -309,6 +306,34 @@
                 <h1>Documentação AquaFlow</h1>
                 <p>O guia completo da plataforma de agricultura inteligente e sustentável para Moçambique.</p>
             </div>
+
+            <section class="section-card" id="tech-stack">
+                <h2><i data-lucide="layers"></i> Stack Tecnológica</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4>Frontend Vanilla</h4>
+                        <p>Construído com <strong>HTML5</strong> semântico e <strong>CSS3</strong> moderno (Custom
+                            Properties e Flexbox).</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>JavaScript (ES6+)</h4>
+                        <p>Lógica de simulação, manipulação de DOM e gestão de estado local puramente em JS.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Chart.js</h4>
+                        <p>Biblioteca utilizada para renderização dos gráficos de histórico de umidade em tempo real.
+                        </p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Lucide Icons</h4>
+                        <p>Conjunto de ícones vetoriais leves e consistentes para interface amigável.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>PWA Technology</h4>
+                        <p>Service Workers e Manifest para instalação como aplicativo nativo e cache offline.</p>
+                    </div>
+                </div>
+            </section>
 
             <section class="section-card" id="data">
                 <h2><i data-lucide="database"></i> Arquitetura de Dados</h2>
@@ -389,6 +414,32 @@
                         <h4>Módulo Relé Industrial</h4>
                         <p>Chaveia a energia para ligar a bomba de irrigação ou eletroválvulas.</p>
                     </div>
+                </div>
+            </section>
+
+            <section class="section-card" id="api-details">
+                <h2><i data-lucide="globe"></i> Integração de APIs Externas</h2>
+                <p>O AquaFlow consome dados reais através de serviços globais de alta precisão:</p>
+
+                <div class="feature-item" style="margin-bottom: 1.5rem;">
+                    <h4>Open-Meteo API</h4>
+                    <p>Utilizada para obter dados meteorológicos precisos de Moçambique sem necessidade de chaves de API
+                        complicadas.</p>
+                    <ul class="hardware-list" style="margin-top: 10px;">
+                        <li><strong>Endpoint:</strong> <code>api.open-meteo.com/v1/forecast</code></li>
+                        <li><strong>Parâmetros:</strong> Latitude/Longitude, Current Weather, Daily Forecast.</li>
+                        <li><strong>Frequência de Sync:</strong> Cada 10 minutos (600,000ms).</li>
+                    </ul>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Exemplo de Requisição (Fetch)</span>
+                    </div>
+                    <pre>
+<span class="token key">fetch</span>(<span class="token string">"https://api.open-meteo.com/v1/forecast?latitude=-25.96&longitude=32.57&current=temperature_2m,relative_humidity_2m&daily=weather_code&timezone=auto"</span>)
+  .<span class="token key">then</span>(res => res.json())
+  .<span class="token key">then</span>(data => console.log(data));</pre>
                 </div>
             </section>
 
