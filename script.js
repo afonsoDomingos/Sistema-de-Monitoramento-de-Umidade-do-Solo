@@ -3,6 +3,8 @@ const CONFIG = {
     UPDATE_INTERVAL: 2000,
     WEATHER_SYNC_INTERVAL: 600000,
     CHART_POINTS: 20,
+    WATER_FLOW_RATE: 0.15, // Litros por segundo (ajustado para simulação)
+    WATER_COST_PER_LITER: 0.045, // Ex: 45 MT por cada 1000 litros
     LOCATIONS: {
         mapito: { lat: -25.9692, lon: 32.5732, name: "Maputo" },
         beira: { lat: -19.8436, lon: 34.8389, name: "Beira" },
@@ -29,6 +31,8 @@ let state = {
     moisture: 65,
     isPumpOn: false,
     isAutoMode: true,
+    totalLiters: 0,
+    totalCost: 0,
     theme: 'dark',
     weather: { current: {}, forecast: [] },
     moistureHistory: Array(CONFIG.CHART_POINTS).fill(65),
@@ -65,7 +69,10 @@ const elements = {
     saveSettings: document.getElementById('save-settings'),
     themeToggle: document.getElementById('theme-toggle'),
     themeIcon: document.getElementById('theme-icon'),
-    notificationContainer: document.getElementById('notification-container')
+    notificationContainer: document.getElementById('notification-container'),
+    waterLiters: document.getElementById('water-liters'),
+    waterCost: document.getElementById('water-cost'),
+    savingsAlert: document.getElementById('savings-alert')
 };
 
 // --- WEATHER & FORECAST ---
@@ -86,20 +93,31 @@ const syncWeather = async () => {
 
         setWeatherIcon(elements.weatherIcon, data.current.weather_code);
 
-        // Update Forecast
+        // Smart Savings Logic (Rain prediction)
+        let rainPredicted = false;
         elements.forecastList.innerHTML = '';
         for (let i = 1; i <= 3; i++) {
+            const code = data.daily.weather_code[i];
+            if (code >= 51) rainPredicted = true; // Codes 51+ indicate rain/storm
+
             const date = new Date(data.daily.time[i]);
             const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' });
             const item = document.createElement('div');
             item.className = 'forecast-item';
             item.innerHTML = `
                 <span class="forecast-day">${dayName}</span>
-                <i class="forecast-icon" data-lucide="${getIconName(data.daily.weather_code[i])}"></i>
+                <i class="forecast-icon" data-lucide="${getIconName(code)}"></i>
                 <span class="forecast-temp">${Math.round(data.daily.temperature_2m_max[i])}°C</span>
             `;
             elements.forecastList.appendChild(item);
         }
+
+        if (rainPredicted) {
+            elements.savingsAlert.classList.remove('hidden');
+        } else {
+            elements.savingsAlert.classList.add('hidden');
+        }
+
         lucide.createIcons();
     } catch (e) {
         showNotification("Erro no Clima", "Não foi possível carregar a previsão.", "warning");
@@ -169,6 +187,11 @@ const updatePump = (isOn, manual = false) => {
     }
 };
 
+const updateConsumptionUI = () => {
+    elements.waterLiters.textContent = state.totalLiters.toFixed(1);
+    elements.waterCost.textContent = state.totalCost.toFixed(2);
+};
+
 const addLog = (msg) => {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     state.logs.unshift({ time, msg });
@@ -194,6 +217,13 @@ const showNotification = (title, message, type) => {
 setInterval(() => {
     if (state.isPumpOn) {
         state.moisture += 1.5;
+
+        // Calculate consumption (Update interval is 2s)
+        const litersGained = CONFIG.WATER_FLOW_RATE * (CONFIG.UPDATE_INTERVAL / 1000);
+        state.totalLiters += litersGained;
+        state.totalCost += litersGained * CONFIG.WATER_COST_PER_LITER;
+        updateConsumptionUI();
+
         if (state.moisture >= state.limits.high && state.isAutoMode) {
             updatePump(false);
             addLog("Auto: Limite ideal atingido");
@@ -213,6 +243,9 @@ setInterval(() => {
     state.moistureHistory.shift();
     if (moistureChart) moistureChart.update('none');
 }, CONFIG.UPDATE_INTERVAL);
+
+// Periodic Weather Sync
+setInterval(syncWeather, CONFIG.WEATHER_SYNC_INTERVAL);
 
 // --- EVENT LISTENERS ---
 elements.cropSelect.addEventListener('change', (e) => updateCropProfile(e.target.value));
@@ -283,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
 });
 
-// PWA Service Worker (Basic registration)
+// PWA Service Worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => { });
 }

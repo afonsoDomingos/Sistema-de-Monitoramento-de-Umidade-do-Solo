@@ -107,6 +107,27 @@
                 <p class="auto-mode-info">Modo Automático: <strong id="auto-mode-status">Ativado</strong></p>
             </div>
 
+            <div class="card consumption-card">
+                <div class="card-header">
+                    <h3>Consumo e Eficiência</h3>
+                    <i data-lucide="droplets"></i>
+                </div>
+                <div class="consumption-grid">
+                    <div class="cons-item">
+                        <span class="label">Volume Gasto</span>
+                        <span class="value"><span id="water-liters">0.0</span> L</span>
+                    </div>
+                    <div class="cons-item">
+                        <span class="label">Custo Estimado</span>
+                        <span class="value"><span id="water-cost">0.00</span> MT</span>
+                    </div>
+                </div>
+                <div id="savings-alert" class="savings-alert hidden">
+                    <i data-lucide="info"></i>
+                    <p>Chuva prevista! Adie a rega para economizar.</p>
+                </div>
+            </div>
+
             <div class="card chart-card">
                 <div class="card-header">
                     <h3>Histórico de Umidade</h3>
