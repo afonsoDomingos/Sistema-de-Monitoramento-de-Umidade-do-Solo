@@ -47,10 +47,21 @@
                 </div>
                 <div class="crop-options">
                     <select id="crop-select" class="custom-select">
-                        <option value="banana" selected>Banana (Umidade Alta)</option>
-                        <option value="milho">Milho (Umidade Média)</option>
-                        <option value="cacto">Cacto (Umidade Baixa)</option>
-                        <option value="tomate">Tomate (Equilibrado)</option>
+                        <optgroup label="Grandes Culturas">
+                            <option value="banana" selected>Banana</option>
+                            <option value="arroz">Arroz (Saturado)</option>
+                            <option value="cana">Cana-de-Açúcar</option>
+                            <option value="milho">Milho</option>
+                        </optgroup>
+                        <optgroup label="Resistentes e Raízes">
+                            <option value="mandioca">Mandioca (Resistente)</option>
+                            <option value="batata_doce">Batata-doce</option>
+                            <option value="amendoim">Amendoim / N'tchocha</option>
+                        </optgroup>
+                        <optgroup label="Hortícolas">
+                            <option value="tomate">Tomate</option>
+                            <option value="feijao">Feijão Caupi</option>
+                        </optgroup>
                     </select>
                 </div>
                 <p class="crop-info">Recomendado: <strong id="recommended-range">60% - 90%</strong></p>

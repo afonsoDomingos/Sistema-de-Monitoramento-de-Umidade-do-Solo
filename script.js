@@ -11,9 +11,14 @@ const CONFIG = {
     },
     CROP_PROFILES: {
         banana: { low: 60, high: 90, name: "Banana" },
+        arroz: { low: 80, high: 98, name: "Arroz" },
+        cana: { low: 65, high: 85, name: "Cana-de-Açúcar" },
         milho: { low: 40, high: 70, name: "Milho" },
-        cacto: { low: 15, high: 35, name: "Cacto" },
-        tomate: { low: 50, high: 80, name: "Tomate" }
+        mandioca: { low: 30, high: 55, name: "Mandioca" },
+        batata_doce: { low: 50, high: 75, name: "Batata-doce" },
+        amendoim: { low: 35, high: 55, name: "Amendoim" },
+        tomate: { low: 50, high: 80, name: "Tomate" },
+        feijao: { low: 45, high: 70, name: "Feijão Caupi" }
     }
 };
 
