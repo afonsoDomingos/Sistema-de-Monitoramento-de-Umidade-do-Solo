@@ -14,11 +14,11 @@ let state = {
     humidity: 12,
     windSpeed: 15,
     maxTemp: 31,
+    theme: 'dark',
     moistureHistory: Array(CONFIG.CHART_POINTS).fill(45),
     timeLabels: Array(CONFIG.CHART_POINTS).fill(''),
     logs: [
-        { time: "10:30", message: "Sistema inicializado com sucesso" },
-        { time: "10:31", message: "Conexão com sensores estabelecida" }
+        { time: "10:30", message: "Sistema AquaFlow inicializado" }
     ]
 };
 
@@ -36,7 +36,9 @@ const elements = {
     windSpeed: document.getElementById('wind-speed'),
     maxTemp: document.getElementById('max-temp'),
     logList: document.getElementById('activity-logs'),
-    notificationContainer: document.getElementById('notification-container')
+    notificationContainer: document.getElementById('notification-container'),
+    themeToggle: document.getElementById('theme-toggle'),
+    themeIcon: document.getElementById('theme-icon')
 };
 
 // --- CHART INITIALIZATION ---
@@ -75,7 +77,7 @@ const initChart = () => {
                 y: {
                     beginAtZero: true,
                     max: 100,
-                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    grid: { color: state.theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
                     ticks: { color: '#94a3b8' }
                 },
                 x: {
@@ -87,17 +89,40 @@ const initChart = () => {
     });
 };
 
+// --- THEME MANAGEMENT ---
+const toggleTheme = () => {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', state.theme);
+
+    // Update icon
+    elements.themeIcon.setAttribute('data-lucide', state.theme === 'dark' ? 'moon' : 'sun');
+    lucide.createIcons();
+
+    // Update chart
+    if (moistureChart) {
+        moistureChart.options.scales.y.grid.color = state.theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+        moistureChart.update();
+    }
+
+    localStorage.setItem('aquaflow-theme', state.theme);
+    showNotification("Tema Alterado", `Modo ${state.theme === 'dark' ? 'Escuro' : 'Claro'} ativado.`, 'success');
+};
+
 // --- NOTIFICATION SYSTEM ---
 const showNotification = (title, message, type = 'success') => {
     const id = Date.now();
-    const icon = type === 'critical' ? 'alert-triangle' : (type === 'warning' ? 'info' : 'check-circle');
+    const iconMap = {
+        critical: 'alert-triangle',
+        warning: 'info',
+        success: 'check-circle'
+    };
 
     const notification = document.createElement('div');
     notification.className = `notification notification-${type} ${type}`;
     notification.id = `notif-${id}`;
 
     notification.innerHTML = `
-        <i data-lucide="${icon}"></i>
+        <i data-lucide="${iconMap[type] || 'check-circle'}"></i>
         <div class="notification-content">
             <h4>${title}</h4>
             <p>${message}</p>
@@ -107,10 +132,7 @@ const showNotification = (title, message, type = 'success') => {
     elements.notificationContainer.appendChild(notification);
     lucide.createIcons();
 
-    // Animate in
     setTimeout(() => notification.classList.add('show'), 100);
-
-    // Remove after 5s
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 500);
@@ -175,7 +197,6 @@ const renderLogs = () => {
 
 // --- SIMULATION LOOP ---
 setInterval(() => {
-    // 1. Moisture Logic
     if (state.isPumpOn) {
         state.moisture += Math.random() * 3 + 1;
         if (state.moisture >= CONFIG.CRITICAL_HIGH && state.isAutoMode) {
@@ -192,25 +213,21 @@ setInterval(() => {
         }
     }
 
-    // Bounds
     state.moisture = Math.max(0, Math.min(100, state.moisture));
     setGaugeValue(state.moisture);
 
-    // 2. Update History & Chart
     state.moistureHistory.push(state.moisture);
     state.moistureHistory.shift();
-    moistureChart.update('none'); // Update without transition for performance
+    if (moistureChart) moistureChart.update('none');
 
-    // 3. Weather Simulation
     state.temperature += (Math.random() - 0.5) * 0.2;
     state.humidity += (Math.random() - 0.5) * 0.3;
 
     elements.currentTemp.textContent = Math.round(state.temperature);
     elements.weatherHumidity.textContent = Math.round(Math.max(0, state.humidity)) + "%";
 
-    // Critical temperature alert
     if (state.temperature > 35) {
-        showNotification("Alerta de Calor", "Temperatura elevada detectada. Monitore a plantação.", "warning");
+        showNotification("Alerta de Calor", "Temperatura elevada detectada.", "warning");
     }
 }, CONFIG.UPDATE_INTERVAL);
 
@@ -219,14 +236,25 @@ elements.pumpToggle.addEventListener('change', (e) => {
     updatePump(e.target.checked, true);
 });
 
+elements.themeToggle.addEventListener('click', toggleTheme);
+
 // Initial Setup
 window.addEventListener('DOMContentLoaded', () => {
+    // Load saved theme
+    const savedTheme = localStorage.getItem('aquaflow-theme');
+    if (savedTheme) {
+        state.theme = savedTheme;
+        document.documentElement.setAttribute('data-theme', state.theme);
+        elements.themeIcon.setAttribute('data-lucide', state.theme === 'dark' ? 'moon' : 'sun');
+    }
+
     initChart();
     renderLogs();
     setGaugeValue(state.moisture);
     updatePump(state.isPumpOn);
+    lucide.createIcons();
 
     setTimeout(() => {
-        showNotification("Bem-vindo ao AquaFlow", "Monitoramento inteligente ativo e operacional.", "success");
+        showNotification("Bem-vindo ao AquaFlow", "Monitoramento inteligente ativo.", "success");
     }, 1000);
 });
