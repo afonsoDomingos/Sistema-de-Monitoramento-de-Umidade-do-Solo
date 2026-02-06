@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação | AquaFlow Mozambique</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .doc-container {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .doc-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 3rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .doc-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .doc-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .doc-section {
+            margin-bottom: 3rem;
+        }
+
+        .doc-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .grid-docs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .status-box {
+            padding: 1.5rem;
+            border-radius: 16px;
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        .status-box h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .real-status {
+            color: var(--primary);
+        }
+
+        .sim-status {
+            color: var(--accent);
+        }
+
+        .hardware-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .hardware-list li {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .hardware-list li::before {
+            content: "➔";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .grid-docs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glass-bg"></div>
+
+    <div class="doc-container">
+        <a href="index.html" class="back-link">
+            <i data-lucide="arrow-left"></i> Voltar ao Dashboard
+        </a>
+
+        <div class="doc-card">
+            <header class="doc-header">
+                <h1>Documentação Técnica</h1>
+                <p>AquaFlow - Sistema de Monitoramento Inteligente (Versão Mozambique)</p>
+            </header>
+
+            <section class="doc-section">
+                <h2><i data-lucide="info"></i> Visão Geral</h2>
+                <p>O AquaFlow foi desenvolvido para otimizar o consumo de água e monitorar a saúde das plantações em
+                    Moçambique. O sistema integra previsões meteorológicas locais com um "Gêmeo Digital" que simula o
+                    comportamento do solo em tempo real baseado no tipo de cultivo escolhido.</p>
+            </section>
+
+            <section class="doc-section">
+                <h2><i data-lucide="layers"></i> Transparência de Dados</h2>
+                <p>Para garantir a fluidez da demonstração, o painel utiliza um modelo de dados híbrido:</p>
+                <div class="grid-docs">
+                    <div class="status-box">
+                        <h3 class="real-status">✅ O que é REAL (Via API)</h3>
+                        <ul class="hardware-list">
+                            <li><strong>Meteorologia Local:</strong> Temperatura, humidade e vento sincronizados com
+                                Maputo, Beira ou Nampula.</li>
+                            <li><strong>Previsão (3 Dias):</strong> Dados de satélite para planeamento antecipado.</li>
+                            <li><strong>Relógio do Sistema:</strong> Horário local oficial.</li>
+                        </ul>
+                    </div>
+                    <div class="status-box">
+                        <h3 class="sim-status">🛠️ O que é SIMULADO</h3>
+                        <ul class="hardware-list">
+                            <li><strong>Umidade do Solo:</strong> Valores calculados algoritmicamente para mostrar a
+                                dinâmica de secagem.</li>
+                            <li><strong>Atividade da Bomba:</strong> Simulação visual da activação e fluxo de água.</li>
+                            <li><strong>Logs de Automação:</strong> Histórico de decisões baseadas no modelo botânico.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2><i data-lucide="cpu"></i> Integração com Hardware (Sensores)</h2>
+                <p>Para transformar este dashboard num sistema de campo 100% real, é necessário integrar os seguintes
+                    componentes físicos:</p>
+                <ul class="hardware-list">
+                    <li><strong>Microcontrolador:</strong> ESP32 ou Arduino com módulo Wi-Fi para enviar dados para a
+                        nuvem.</li>
+                    <li><strong>Sensor de Umidade do Solo:</strong> Recomendado o uso de sensores capacitivos (mais
+                        resistentes à corrosão) como o <em>Capacitive Soil Moisture Sensor v1.2</em>.</li>
+                    <li><strong>Atuador de Irrigação:</strong> Um módulo Relé de 5V/12V acoplado a uma eletroválvula ou
+                        motobomba.</li>
+                    <li><strong>Fonte de Energia:</strong> Painéis solares de 10W-20W com bateria Li-ion para operação
+                        remota.</li>
+                </ul>
+            </section>
+
+            <section class="doc-section">
+                <h2><i data-lucide="wrench"></i> Como Conectar</h2>
+                <p>O código actual possui uma estrutura pronta para receber dados externos. A função
+                    <code>setInterval</code> no <code>script.js</code> deve ser substituída por um <code>fetch()</code>
+                    que consulta o endereço IP do seu microcontrolador (ex: ESP32) enviando os dados em formato JSON:
+                </p>
+                <pre
+                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; font-size: 0.85rem; color: #abb2bf; overflow-x: auto;">
+{
+  "umidade_solo": 58,
+  "bomba_ativa": true
+}</pre>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>Desenvolvido por <a href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/" target="_blank"
+                    class="footer-name">Afonso Domingos (MUV)</a></p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
