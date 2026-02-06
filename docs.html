@@ -4,112 +4,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentação | AquaFlow Mozambique</title>
+    <title>Documentação Técnica | AquaFlow</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .doc-container {
-            max-width: 900px;
-            margin: 4rem auto;
-            padding: 2rem;
-            line-height: 1.6;
+        :root {
+            --docs-primary: #2ecc71;
+            --docs-secondary: #3498db;
+            --docs-card-bg: rgba(30, 41, 59, 0.4);
         }
 
-        .doc-card {
+        .docs-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 3rem;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .docs-sidebar {
+            position: sticky;
+            top: 2rem;
+            height: calc(100vh - 4rem);
+            padding: 2rem;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 24px;
-            padding: 3rem;
             backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
-        .doc-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .doc-header h1 {
-            font-size: 2.5rem;
-            color: var(--primary);
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--docs-primary);
             margin-bottom: 1rem;
-        }
-
-        .doc-section {
-            margin-bottom: 3rem;
-        }
-
-        .doc-section h2 {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--secondary);
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 0.5rem;
         }
 
-        .grid-docs {
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text-main);
+            transform: translateX(5px);
+        }
+
+        .nav-link i {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Documentation Content */
+        .docs-content {
+            padding-bottom: 5rem;
+        }
+
+        .doc-hero {
+            margin-bottom: 4rem;
+            padding: 4rem;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(52, 152, 219, 0.1));
+            border-radius: 32px;
+            border: 1px solid var(--card-border);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doc-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, var(--docs-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .doc-hero p {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-card {
+            background: var(--docs-card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(46, 204, 113, 0.3);
+        }
+
+        .section-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--docs-secondary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-card h2 i {
+            color: var(--docs-primary);
+        }
+
+        .feature-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-item h4 {
+            color: var(--docs-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-item p {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        /* Code Block Enhancement */
+        .code-container {
+            background: #011627;
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            margin: 1.5rem 0;
+            border: 1px solid #1e293b;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-lang {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--docs-secondary);
+        }
+
+        pre {
+            margin: 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #d6deeb;
+            overflow-x: auto;
+        }
+
+        .token.key {
+            color: #7fdbca;
+        }
+
+        .token.string {
+            color: #ecc48d;
+        }
+
+        .token.number {
+            color: #f78c6c;
+        }
+
+        .token.boolean {
+            color: #ff5874;
+        }
+
+        /* Tech Table */
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 1.5rem;
         }
 
-        .status-box {
-            padding: 1.5rem;
-            border-radius: 16px;
-            background: rgba(128, 128, 128, 0.05);
+        .tech-table th,
+        .tech-table td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--card-border);
         }
 
-        .status-box h3 {
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-        }
-
-        .real-status {
-            color: var(--primary);
-        }
-
-        .sim-status {
-            color: var(--accent);
-        }
-
-        .hardware-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .hardware-list li {
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .hardware-list li::before {
-            content: "➔";
-            position: absolute;
-            left: 0;
-            color: var(--primary);
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        .tech-table th {
             color: var(--text-dim);
-            text-decoration: none;
-            margin-bottom: 2rem;
-            transition: color 0.3s;
+            font-weight: 600;
         }
 
-        .back-link:hover {
-            color: var(--primary);
+        .badge {
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
 
-        @media (max-width: 768px) {
-            .grid-docs {
+        .badge-real {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .badge-sim {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+            border: 1px solid rgba(241, 196, 15, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .docs-wrapper {
                 grid-template-columns: 1fr;
+            }
+
+            .docs-sidebar {
+                display: none;
+                /* Can be changed to a top nav or hamburger later */
+            }
+
+            .doc-hero {
+                padding: 2rem;
+            }
+
+            .doc-hero h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .section-card {
+                padding: 1.5rem;
+            }
+
+            .doc-hero h1 {
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -118,91 +279,164 @@
 <body>
     <div class="glass-bg"></div>
 
-    <div class="doc-container">
-        <a href="index.html" class="back-link">
-            <i data-lucide="arrow-left"></i> Voltar ao Dashboard
-        </a>
+    <div class="docs-wrapper">
+        <aside class="docs-sidebar">
+            <div class="sidebar-title">
+                <i data-lucide="book-open"></i> Menu
+            </div>
+            <a href="index.html" class="nav-link">
+                <i data-lucide="layout-dashboard"></i> Voltar ao App
+            </a>
+            <a href="#intro" class="nav-link active">
+                <i data-lucide="info"></i> Introdução
+            </a>
+            <a href="#data" class="nav-link">
+                <i data-lucide="database"></i> Dados e Transparência
+            </a>
+            <a href="#crops" class="nav-link">
+                <i data-lucide="leaf"></i> Catálogo de Culturas
+            </a>
+            <a href="#hardware" class="nav-link">
+                <i data-lucide="cpu"></i> Hardware e Sensores
+            </a>
+            <a href="#integration" class="nav-link">
+                <i data-lucide="code-2"></i> Guia de Integração
+            </a>
+        </aside>
 
-        <div class="doc-card">
-            <header class="doc-header">
-                <h1>Documentação Técnica</h1>
-                <p>AquaFlow - Sistema de Monitoramento Inteligente (Versão Mozambique)</p>
-            </header>
+        <main class="docs-content">
+            <div class="doc-hero" id="intro">
+                <h1>Documentação AquaFlow</h1>
+                <p>O guia completo da plataforma de agricultura inteligente e sustentável para Moçambique.</p>
+            </div>
 
-            <section class="doc-section">
-                <h2><i data-lucide="info"></i> Visão Geral</h2>
-                <p>O AquaFlow foi desenvolvido para otimizar o consumo de água e monitorar a saúde das plantações em
-                    Moçambique. O sistema integra previsões meteorológicas locais com um "Gêmeo Digital" que simula o
-                    comportamento do solo em tempo real baseado no tipo de cultivo escolhido.</p>
+            <section class="section-card" id="data">
+                <h2><i data-lucide="database"></i> Arquitetura de Dados</h2>
+                <p>O AquaFlow opera com um modelo de dados híbrido que combina inteligência local com dados globais de
+                    satélite para máxima precisão.</p>
+
+                <table class="tech-table">
+                    <thead>
+                        <tr>
+                            <th>Módulo</th>
+                            <th>Fonte</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Clima em Tempo Real</td>
+                            <td>Open-Meteo API (Satélite)</td>
+                            <td><span class="badge badge-real">REAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>Previsão para 3 Dias</td>
+                            <td>Open-Meteo Forecast</td>
+                            <td><span class="badge badge-real">REAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>Umidade do Solo</td>
+                            <td>Algoritmo Botânico (Gêmeo Digital)</td>
+                            <td><span class="badge badge-sim">SIMULADO</span></td>
+                        </tr>
+                        <tr>
+                            <td>Consumo de Água</td>
+                            <td>Medição por Tempo de Fluxo</td>
+                            <td><span class="badge badge-sim">ESTIMADO</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </section>
 
-            <section class="doc-section">
-                <h2><i data-lucide="layers"></i> Transparência de Dados</h2>
-                <p>Para garantir a fluidez da demonstração, o painel utiliza um modelo de dados híbrido:</p>
-                <div class="grid-docs">
-                    <div class="status-box">
-                        <h3 class="real-status">✅ O que é REAL (Via API)</h3>
-                        <ul class="hardware-list">
-                            <li><strong>Meteorologia Local:</strong> Temperatura, humidade e vento sincronizados com
-                                Maputo, Beira ou Nampula.</li>
-                            <li><strong>Previsão (3 Dias):</strong> Dados de satélite para planeamento antecipado.</li>
-                            <li><strong>Relógio do Sistema:</strong> Horário local oficial.</li>
-                        </ul>
+            <section class="section-card" id="crops">
+                <h2><i data-lucide="leaf"></i> Catálogo de Cultivos (15 Variedades)</h2>
+                <p>O sistema possui 15 perfis pré-configurados baseados na realidade agrícola de Moçambique, ajustando
+                    os ciclos de rega automaticamente.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4><i data-lucide="check"></i> Cereais</h4>
+                        <p>Arroz (Saturado), Milho, Sorgo e Soja.</p>
                     </div>
-                    <div class="status-box">
-                        <h3 class="sim-status">🛠️ O que é SIMULADO</h3>
-                        <ul class="hardware-list">
-                            <li><strong>Umidade do Solo:</strong> Valores calculados algoritmicamente para mostrar a
-                                dinâmica de secagem.</li>
-                            <li><strong>Atividade da Bomba:</strong> Simulação visual da activação e fluxo de água.</li>
-                            <li><strong>Logs de Automação:</strong> Histórico de decisões baseadas no modelo botânico.
-                            </li>
-                        </ul>
+                    <div class="feature-item">
+                        <h4><i data-lucide="check"></i> Tubérculos</h4>
+                        <p>Mandioca, Batata-doce e Amendoim (N'tchocha).</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i data-lucide="check"></i> Exportação</h4>
+                        <p>Caju, Gergelim, Girassol e Cana-de-Açúcar.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i data-lucide="check"></i> Frutíferas</h4>
+                        <p>Banana, Citrinos (Laranja/Limão) e Tomate.</p>
                     </div>
                 </div>
             </section>
 
-            <section class="doc-section">
-                <h2><i data-lucide="cpu"></i> Integração com Hardware (Sensores)</h2>
-                <p>Para transformar este dashboard num sistema de campo 100% real, é necessário integrar os seguintes
-                    componentes físicos:</p>
-                <ul class="hardware-list">
-                    <li><strong>Microcontrolador:</strong> ESP32 ou Arduino com módulo Wi-Fi para enviar dados para a
-                        nuvem.</li>
-                    <li><strong>Sensor de Umidade do Solo:</strong> Recomendado o uso de sensores capacitivos (mais
-                        resistentes à corrosão) como o <em>Capacitive Soil Moisture Sensor v1.2</em>.</li>
-                    <li><strong>Atuador de Irrigação:</strong> Um módulo Relé de 5V/12V acoplado a uma eletroválvula ou
-                        motobomba.</li>
-                    <li><strong>Fonte de Energia:</strong> Painéis solares de 10W-20W com bateria Li-ion para operação
-                        remota.</li>
-                </ul>
+            <section class="section-card" id="hardware">
+                <h2><i data-lucide="cpu"></i> Componentes de Hardware</h2>
+                <p>Para levar o AquaFlow para o campo físico, sugerimos a seguinte configuração de hardware:</p>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4>ESP32 Wi-Fi / LoRa</h4>
+                        <p>O cérebro da unidade de campo que envia os dados para o dashboard.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Sensor Capacitivo v1.2</h4>
+                        <p>Mede a umidade sem sofrer corrosão por eletrólise no solo.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Módulo Relé Industrial</h4>
+                        <p>Chaveia a energia para ligar a bomba de irrigação ou eletroválvulas.</p>
+                    </div>
+                </div>
             </section>
 
-            <section class="doc-section">
-                <h2><i data-lucide="wrench"></i> Como Conectar</h2>
-                <p>O código actual possui uma estrutura pronta para receber dados externos. A função
-                    <code>setInterval</code> no <code>script.js</code> deve ser substituída por um <code>fetch()</code>
-                    que consulta o endereço IP do seu microcontrolador (ex: ESP32) enviando os dados em formato JSON:
-                </p>
-                <pre
-                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; font-size: 0.85rem; color: #abb2bf; overflow-x: auto;">
+            <section class="section-card" id="integration">
+                <h2><i data-lucide="code-2"></i> Guia de Integração API</h2>
+                <p>O dashboard está preparado para se conectar a dispositivos IoT. O seu microcontrolador deve enviar um
+                    payload JSON no seguinte formato:</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">sensor_payload.json</span>
+                        <i data-lucide="copy" style="width:14px; cursor:pointer;"></i>
+                    </div>
+                    <pre>
 {
-  "umidade_solo": 58,
-  "bomba_ativa": true
+  <span class="token key">"location_id"</span>: <span class="token string">"maputo_field_01"</span>,
+  <span class="token key">"moisture"</span>: <span class="token number">68.5</span>,
+  <span class="token key">"pump_status"</span>: <span class="token boolean">true</span>,
+  <span class="token key">"timestamp"</span>: <span class="token string">"2026-02-06T12:55:00Z"</span>
 }</pre>
+                </div>
             </section>
-        </div>
+        </main>
     </div>
-
-    <footer>
-        <div class="footer-content">
-            <p>Desenvolvido por <a href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/" target="_blank"
-                    class="footer-name">Afonso Domingos (MUV)</a></p>
-        </div>
-    </footer>
 
     <script>
         lucide.createIcons();
+
+        // Simple scroll spy logic
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
     </script>
 </body>
 
